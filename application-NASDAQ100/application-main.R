@@ -1,8 +1,8 @@
 library(data.table)
-#library(parallel)
+library(parallel)
 
-X <- as.matrix(fread("X_NASDAQ100"))
-NASDAQ100 <- fread("NASDAQ100")
+X <- as.matrix(fread("application-NASDAQ100/X_NASDAQ100"))
+NASDAQ100 <- fread("application-NASDAQ100/NASDAQ100")
 
 full.names <- as.vector(NASDAQ100$Name)
 sectors <- as.vector(NASDAQ100$Sector)
@@ -32,18 +32,19 @@ d <- ncol(X)
 #########################################################################
 
 
-path <- readRDS("path_NASDAQ100_Para")
+path <- readRDS("application-NASDAQ100/path_NASDAQ100_Para")
 
 
-elements <- 1:106
+#elements <- 1:106
 #a <- stoppingCriterion0Para(path$Th, path$D, path$S, elements)
 #saveRDS(a, "a_NASDAQ100_Para")
 
-a <- saveRDS("a_NASDAQ100_Para")
+a <- readRDS("a_NASDAQ100_Para")
 
 alpha <- .99
-
 final <- elements[which(a < alpha)[1] - 1] 
+
+# for some very intuitive groups, run
 #final <- 80
 
 D.final <- path$D[[final]]
@@ -114,6 +115,8 @@ Tt.final <- (D2.final %*% (path$Th[new,new] - diag(d)) %*% D2.final) / (D2.final
 diag(Tt.final) <- 1
 
 image(t(Tt.final[d:1,]), axes=FALSE, zlim=c(-1,1), col=colfunc(100), main = paste0("The matrix Tau.tilde ",final))
+
+
 
 # using the data.table created in the other file, we create a very basic output of the clusters.
 for(i in 1:length(new.list)){
