@@ -17,6 +17,7 @@ stoppingCriterion0Para <- function(Tau.hat, Delta.list, Sigma.list, elements = N
   t1 <- Sys.time()
   
   clusterExport(cl, c("Tau.hat", "Delta.list", "Sigma.list" , "tau.hat", "l.ij.mat", "d", "p"), envir = environment())
+  clusterEvalQ(cl,library("Matrix"))
   # To use matrix.trace, should export the package matrixcalc also... or use matrixcalc::matrix.trace (?)
     
   t2 <- Sys.time()
@@ -50,30 +51,24 @@ stoppingCriterion0Para <- function(Tau.hat, Delta.list, Sigma.list, elements = N
     
     l.blocks <- (double.index[,1] - 1) * ma - (double.index[,1] - 1) * (double.index[,1] - 2) / 2 + double.index[, 2] - double.index[, 1] + 1 
     
-    B <- matrix(0,p,max(l.blocks))
-    B[cbind(1:p,l.blocks)] <- 1
-    
-    csB <- colSums(B)
-    csB0 <- which(csB == 0)
-    
-    if(length(csB0) != 0){
-      B <- B[,-csB0]
-      csB <- colSums(B)
+    B <- sparseMatrix(i = 1:p, j = l.blocks)
+    if(ncol(B) > 1){
+      B <- B[,unique(summary(B)$j)]
     }
 
-    #Gamma <- B%*%ginv(B)
-    Gamma <- B %*% (t(B) / csB)
+    csB <- colSums(B)
 
+    Gamma <- B %*% (t(B) / csB)
+    
     #image(t(Gamma[p:1,]), axes=FALSE, zlim=c(-1,1), col=colfunc(50))
     #image(t((B %*% (t(B) / csB))[p:1,]), axes=FALSE, zlim=c(-1,1), col=colfunc(50))
     
     tau.tilde <- ((Delta2 %*% (Tau.hat - diag(d)) %*% Delta2) / (Delta2 %*% (1 - diag(d)) %*% Delta2))[l.ij.mat]
-    vec <- crossprod(tau.tilde - tau.hat, diag(p) - Gamma)
+    vec <- crossprod(tau.tilde - tau.hat, sparseMatrix(1:p,1:p) - Gamma)
     
     
     
-    # This next line needs to be more efficient!!!!
-    R <- tcrossprod(vec,Sigma.list[[i]]^(-1) * vec)
+    R <- as.numeric(tcrossprod(vec,Sigma.list[[i]]^(-1) * vec))
     
     #print(matrix.trace(Gamma))
     #1 - pchisq(R, p - matrix.trace(Gamma))
@@ -86,7 +81,7 @@ stoppingCriterion0Para <- function(Tau.hat, Delta.list, Sigma.list, elements = N
 
   if(length(ones) > 0){
     new.al <- rep(1, length(elements))
-    new.al[-elements] <- al
+    new.al[elements.red] <- al
   return(new.al)  
   }else{
     return(al)

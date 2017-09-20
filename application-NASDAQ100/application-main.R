@@ -1,5 +1,6 @@
 library(data.table)
 library(parallel)
+library(Matrix)
 
 X <- as.matrix(fread("application-NASDAQ100/X_NASDAQ100"))
 NASDAQ100 <- fread("application-NASDAQ100/NASDAQ100")
@@ -18,7 +19,8 @@ d <- ncol(X)
 # loading the necessary functions and computing the parameter Theta
 ########
 
-#sapply(list.files(pattern="[.]R$", path = "C:/Users/Samuel/Dropbox/Perreault-Duchesne-Neslehova/Additions/new code", full.names=TRUE), source)
+#sapply(list.files(pattern="[.]R$", path = "simulation-study2-scripts/functions", full.names=TRUE), source)
+#sapply(list.files(pattern="[.]R$", path = "application-NASDAQ100/functions", full.names=TRUE), source)
 #Theta.hat <- computeThPara(X)
 
 
