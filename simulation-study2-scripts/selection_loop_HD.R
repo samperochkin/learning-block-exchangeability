@@ -3,8 +3,10 @@
 library(parallel, lib.loc = '/users/sperreau/R/x86_64-redhat-linux-gnu-library/3.3')
 library(MASS, lib.loc = '/users/sperreau/R/x86_64-redhat-linux-gnu-library/3.3')
 library(matrixcalc, lib.loc = '/users/sperreau/R/x86_64-redhat-linux-gnu-library/3.3')
+library(Matrix, lib.loc = '/users/sperreau/R/x86_64-redhat-linux-gnu-library/3.3')
 library(pcaPP, lib.loc = '/users/sperreau/R/x86_64-redhat-linux-gnu-library/3.3')
 
+# Note: package matrixcalc most likely not needed anymore...
 
 source(paste(getwd(),"/Tau_generatorsHD.R", sep = ""))
 # scenario grid
@@ -19,6 +21,7 @@ cl <- makeCluster(11)
 # export libraries
 clusterEvalQ(cl,library("MASS", lib.loc = '/users/sperreau/R/x86_64-redhat-linux-gnu-library/3.3'))
 clusterEvalQ(cl,library("matrixcalc", lib.loc = '/users/sperreau/R/x86_64-redhat-linux-gnu-library/3.3'))
+clusterEvalQ(cl,library("Matrix", lib.loc = '/users/sperreau/R/x86_64-redhat-linux-gnu-library/3.3'))
 clusterEvalQ(cl,library("pcaPP", lib.loc = '/users/sperreau/R/x86_64-redhat-linux-gnu-library/3.3'))
 
 # load stopping function

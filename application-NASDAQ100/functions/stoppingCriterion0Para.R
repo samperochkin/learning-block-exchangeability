@@ -66,8 +66,6 @@ stoppingCriterion0Para <- function(Tau.hat, Delta.list, Sigma.list, elements = N
     tau.tilde <- ((Delta2 %*% (Tau.hat - diag(d)) %*% Delta2) / (Delta2 %*% (1 - diag(d)) %*% Delta2))[l.ij.mat]
     vec <- crossprod(tau.tilde - tau.hat, sparseMatrix(1:p,1:p) - Gamma)
     
-    
-    
     R <- as.numeric(tcrossprod(vec,Sigma.list[[i]]^(-1) * vec))
     
     #print(matrix.trace(Gamma))

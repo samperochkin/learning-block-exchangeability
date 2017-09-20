@@ -3,6 +3,7 @@
 library(parallel)
 library(MASS)
 library(matrixcalc)
+library(Matrix)
 library(pcaPP)
 
 # create filepath for results

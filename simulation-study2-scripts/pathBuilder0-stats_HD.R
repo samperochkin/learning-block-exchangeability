@@ -3,6 +3,7 @@ library(parallel, lib.loc = '/users/sperreau/R/x86_64-redhat-linux-gnu-library/3
 library(MASS, lib.loc = '/users/sperreau/R/x86_64-redhat-linux-gnu-library/3.3')
 library(matrixcalc, lib.loc = '/users/sperreau/R/x86_64-redhat-linux-gnu-library/3.3')
 library(pcaPP, lib.loc = '/users/sperreau/R/x86_64-redhat-linux-gnu-library/3.3')
+library(Matrix, lib.loc = '/users/sperreau/R/x86_64-redhat-linux-gnu-library/3.3')
 
 
 source(paste(getwd(),"/Tau_generatorsHD.R", sep = ""))

@@ -5,7 +5,10 @@ setwd("C:/Users/Samuel/Dropbox/Perreault-Duchesne-Neslehova/Additions/old code/S
 library(parallel)
 library(MASS)
 library(matrixcalc)
+library(Matrix)
 library(pcaPP)
+
+# Note: package matrixcalc most likely not needed anymore...
 
 # create filepath for results
 # create filepath for results
@@ -23,6 +26,7 @@ cl <- makeCluster(detectCores()-1)
 # export libraries
 clusterEvalQ(cl,library("MASS"))
 clusterEvalQ(cl,library("matrixcalc"))
+clusterEvalQ(cl,library("Matrix"))
 clusterEvalQ(cl,library("pcaPP"))
 
 # load stopping function
