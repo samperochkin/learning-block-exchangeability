@@ -43,8 +43,12 @@ path <- readRDS("application-NASDAQ100/path_NASDAQ100_Para")
 
 a <- readRDS("a_NASDAQ100_Para")
 
-alpha <- .99
-final <- elements[which(a < alpha)[1] - 1] 
+par(mfrow = c(1,1), mar = c(2,2,1,1))
+plot(a, pch = 19, type = "l", xaxt = "n")
+axis(1, at=seq(1,d,10), labels=seq(d,1,-10))
+
+alpha <- .95
+final <- which(a < alpha)[1] - 1
 
 # for some very intuitive groups, run
 #final <- 80
@@ -106,17 +110,17 @@ new <- unlist(sapply(hc$order, function(k){
   new.list[[k]]
 }))
 
-
+#par(mfrow = c(1,1), mar = c(0,0,0,0))
 par(mfrow = c(1,3), mar = c(1,1,1,1))
 colfunc <- colorRampPalette(c("darkred", "darkorange", "palegoldenrod", "forestgreen", "darkblue"))
-image(t(path$Th[d:1,]), axes=FALSE, zlim=c(-1,1), col=colfunc(100), main = "The matrix Tau.hat (order = symbols)")
-image(t(path$Th[new,new][d:1,]), axes=FALSE, zlim=c(-1,1), col=colfunc(100), main = paste0("The matrix Tau.hat (block form of ",final,")"))
+image(t(path$Th[d:1,]), axes=FALSE, zlim=c(-1,1), col=colfunc(100)) # original Tau.hat
+image(t(path$Th[new,new][d:1,]), axes=FALSE, zlim=c(-1,1), col=colfunc(100)) # newly ordered Tau.hat
 
 D2.final <- tcrossprod(D.final,D.final)[new,new]
 Tt.final <- (D2.final %*% (path$Th[new,new] - diag(d)) %*% D2.final) / (D2.final %*% (1 - diag(d)) %*% D2.final)
 diag(Tt.final) <- 1
 
-image(t(Tt.final[d:1,]), axes=FALSE, zlim=c(-1,1), col=colfunc(100), main = paste0("The matrix Tau.tilde ",final))
+image(t(Tt.final[d:1,]), axes=FALSE, zlim=c(-1,1), col=colfunc(100))
 
 
 
