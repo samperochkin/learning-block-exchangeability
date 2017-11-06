@@ -21,13 +21,15 @@ library(data.table)
 # rvest the tickers of NASDAQ 100 stocks ----------------------------------
 
 # We rvest the tickers from internet (www.cnbc.com/nasdaq-100) -- might need to be changed if the site is modified
-symbols <- read_html("https://www.cnbc.com/nasdaq-100/")
+#symbols <- read_html("https://www.cnbc.com/nasdaq-100/")
 
-symbols <- symbols %>%
-    html_nodes(".text a") %>%
-    html_text()
+#symbols <- symbols %>%
+#    html_nodes(".text a") %>%
+#    html_text()
 
-saveRDS(symbols, "symbols")
+#saveRDS(symbols, "application-NASDAQ100/symbols")
+
+symbols <- readRDS("application-NASDAQ100/symbols")
 
 
 

@@ -52,7 +52,7 @@ points(x = 0:10 + 1, y = a[87:97], pch = 19)
 
 
 alpha <- .95
-final <- which(a < alpha)[1] - 1
+final <- which(a < alpha)[1]
 
 # for some very intuitive groups, run
 #final <- 80
