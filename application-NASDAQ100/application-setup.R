@@ -67,7 +67,7 @@ getSymbols.google(symbols.vec,
                   env = .GlobalEnv,
                   return.class = 'xts',
                   from = "2017-01-01",
-                  to = "2017-09-17")
+                  to = "2017-09-30")
 
 
 
@@ -102,7 +102,7 @@ sapply(1:ncol(X), function(i){
   plot(X[,i], type = "l", main = symbols[i])
 })
 
-fwrite(data.table(X), "X_NASDAQ100")
+fwrite(data.table(X), "application-NASDAQ100/X_NASDAQ100")
 
 
 # Little peek at the data -------------------------------------------------
@@ -130,4 +130,4 @@ NASDAQ100 <- t(sapply(symbols, function(s){
 
 NASDAQ100 <- rbindlist(NASDAQ100)
 
-fwrite(NASDAQ100, "NASDAQ100")
+fwrite(NASDAQ100, "application-NASDAQ100/NASDAQ100")

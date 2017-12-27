@@ -9,7 +9,7 @@ full.names <- as.vector(NASDAQ100$Name)
 sectors <- as.vector(NASDAQ100$Sector)
 industry <- as.vector(NASDAQ100$industry)
 
-symbols <- colnames(X)
+colnames(X) <- readRDS("application-NASDAQ100/symbols")
 n <- nrow(X)
 d <- ncol(X)
 
@@ -25,11 +25,11 @@ d <- ncol(X)
 
 
 #######
-# running the algorithm (may take quite a while with d=106 variables)
+# running the algorithm (may take quite a while with d=107 variables)
 #######
 
 #path <- pathBuilder0Para(cor.fk(X), Theta.hat, nrow(X))
-#saveRDS(path, "path_NASDAQ100_Para")
+#saveRDS(path, "application-NASDAQ100/path_NASDAQ100_Para")
 
 #########################################################################
 
@@ -37,22 +37,24 @@ d <- ncol(X)
 path <- readRDS("application-NASDAQ100/path_NASDAQ100_Para")
 
 
-#elements <- 1:106
+#elements <- 1:107
 #a <- stoppingCriterion0Para(path$Th, path$D, path$S, elements)
-#saveRDS(a, "a_NASDAQ100_Para")
+#saveRDS(a, "application-NASDAQ100/a_NASDAQ100_Para")
 
-a <- readRDS("a_NASDAQ100_Para")
+a <- readRDS("application-NASDAQ100/a_NASDAQ100_Para")
 
 par(mfrow = c(1,1), mar = c(2,2,1,1))
 plot(a[87:97], pch = 19, type = "l", xaxt = "n")
 axis(1, at=seq(1,d-87+1,2), labels=seq(d-87+1,1,-2))
 
-points(x = 4:6 + 1, y = a[91:93], pch = 19)
 points(x = 0:10 + 1, y = a[87:97], pch = 19)
 
 
 alpha <- .95
 final <- which(a < alpha)[1]
+
+# So the final i=
+d - final + 1
 
 # for some very intuitive groups, run
 #final <- 80
@@ -105,7 +107,8 @@ diag(Tt.small) <- 0
 # something reasonable.
 ######
 
-hc <- hclust(dist(Tt.small))
+#hc <- hclust(dist(Tt.small))
+hc <- hclust(as.dist(1 - abs(Tt.small)))
 
 
 # and keeping the ordering produced
