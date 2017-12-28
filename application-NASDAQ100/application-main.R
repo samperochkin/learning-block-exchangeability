@@ -43,11 +43,14 @@ path <- readRDS("application-NASDAQ100/path_NASDAQ100_Para")
 
 a <- readRDS("application-NASDAQ100/a_NASDAQ100_Para")
 
-par(mfrow = c(1,1), mar = c(2,2,1,1))
-plot(a[87:97], pch = 19, type = "l", xaxt = "n")
-axis(1, at=seq(1,d-87+1,2), labels=seq(d-87+1,1,-2))
+j1 <- d - 20 + 1
+j2 <- d - 10 + 1
 
-points(x = 0:10 + 1, y = a[87:97], pch = 19)
+par(mfrow = c(1,1), mar = c(2,2,1,1))
+plot(a[j1:j2], pch = 19, type = "l", xaxt = "n")
+axis(1, at=seq(1,d-j1+1,2), labels=seq(d-j1+1,1,-2))
+
+points(x = 0:10 + 1, y = a[j1:j2], pch = 19)
 
 
 alpha <- .95
@@ -61,6 +64,16 @@ d - final + 1
 
 D.final <- path$D[[final]]
 
+
+# sizes of the K = 16 clusters (notice they are all > 1)
+colSums(D.final)
+
+# So the number of distinct parameters is
+K <- d - final + 1
+K * (K+1) / 2
+
+# This is a small number compared to p
+d * (d-1) / 2
 
 ######
 # produce the list of clusters
@@ -139,7 +152,6 @@ for(i in 1:length(new.list)){
   print(paste0(""))
   print(paste0(""))
   print(paste0(""))
-  print(paste0(""))
   print(paste0("##################################################################"))
   if(length(new.list[[i]]) == 1){
     print(paste0("######### cluster ", i, " ################### tau.tilde = 1.000 #######"))
@@ -147,7 +159,6 @@ for(i in 1:length(new.list)){
     print(paste0("######### cluster ", i, " ################### tau.tilde = ",round(Tt.final[conversion[new.list[[i]][1]],conversion[new.list[[i]][2]]], digits = 3) ," #######"))
   }
   print(paste0("##################################################################"))
+  #print(subset(NASDAQ100[new.list[[i]], ], select = c(Symbol, Name, Sector)))
   print(subset(NASDAQ100[new.list[[i]], ], select = c(Symbol, Name, Sector, industry)))
-  print(paste0(""))
-  print(paste0("###################################################################################################"))
 }  
