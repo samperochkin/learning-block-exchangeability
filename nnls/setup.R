@@ -200,7 +200,7 @@ plot(hclust(as.dist(1-Tau.hat)))
 library(sparsePCA)
 
 
-n <- 50
+n <- 150
 X <- mvtnorm::rmvnorm(n, rep(0,d), sigma = Sig)
 
 l.ij.mat <- t(combn(1:d,2))
@@ -278,14 +278,27 @@ der <- sapply(1:p, function(r){
   er <- rep(0,p)
   er[r] <- 1
   
+  Gamma <- diag(p) + delta%*%t(delta)
+  den <- rowSums(Gamma)*colSums(Gamma)
+  den[den == 0] <- 1
+  Gamma <- Gamma/den
+  
   # Remember that we want to maximize. So we look for positice derivative.
   #2*t(tau.hat) %*% delta %*% t(er) %*% Si %*% tau.hat
+  #2*t(tau.hat) %*% delta %*% t(er) %*% Si %*% (diag(p)-Gamma) %*% tau.hat
   #A[r]*t(tau.hat) %*% delta
-  A[r]*t(tau.tilde) %*% delta
+  #A[r]*t(tau.tilde) %*% delta
+  dchisq(t(tau.hat - Gamma %*% tau.hat) %*% Si %*% (tau.hat - Gamma %*% tau.hat), df = p - matrix.trace(Gamma)) * 2*t(tau.hat) %*% delta %*% t(er) %*% Si %*% (diag(p)-Gamma) %*% tau.hat
 })
+der
 
+# --->>> t(delta) %*% tau.hat %*% t(er) %*% Si %*% tau.hat = lambda
+# --->>> delta  = lambda*t(ginv(tau.hat %*% t(er) %*% Si %*% tau.hat))
+
+# need to impose other constraints.
 
 plot(der)
+
 
 #l.ij.mat[which.max(der),]
 l.ij.mat[order(der, decreasing = TRUE)[1:10],]
@@ -305,6 +318,10 @@ delta
 der.mat <- matrix(0,d,d)
 der.mat[l.ij.mat] <- der
 der.mat[l.ij.mat[,2:1]] <- der
+
+t(sapply(1:d, function(i){
+  c(max(der.mat[i,]),min(der.mat[i,]))
+}))
 
 which.max(rowSums(der.mat))
 image(t(der.mat[d:1,]), axes=FALSE, col=colfunc(100))
