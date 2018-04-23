@@ -3,7 +3,7 @@
 
 
 
-stoppingCriterionPara <- function(Tau.hat, Delta.list, Sigma.list, elements = NULL, w = .5){
+stoppingCriterionPara <- function(Tau.hat, clus.list, Sigma.list, elements = NULL, w = .5){
   
   d <- nrow(Tau.hat)
   l.ij.mat <- t(combn(1:d,2))
@@ -11,23 +11,26 @@ stoppingCriterionPara <- function(Tau.hat, Delta.list, Sigma.list, elements = NU
   
   tau.hat <- Tau.hat[l.ij.mat]
   
+  if(is.null(elements)){
+    elements <- 1:d
+  }
+  
   
   ##################################
   cl <- makeCluster(detectCores()-1)
   t1 <- Sys.time()
   
-  clusterExport(cl, c("Tau.hat", "Delta.list", "Sigma.list" , "tau.hat", "l.ij.mat", "d", "p", "w"), envir = environment())
+  ij.l.mat <- matrix(nrow=d,ncol=d)
+  ij.l.mat[rbind(l.ij.mat,l.ij.mat[,2:1])] <- c(1:p,1:p)
+  
+  clusterExport(cl, c("Tau.hat", "clus.list", "Sigma.list" , "tau.hat", "l.ij.mat", "d", "p", "w"), envir = environment())
   clusterEvalQ(cl,library("Matrix"))
   # To use matrix.trace, should export the package matrixcalc also... or use matrixcalc::matrix.trace (?)
-    
+  
   t2 <- Sys.time()
   print(difftime(t2,t1))
   ##################################
   
-  
-  if(is.null(elements)){
-    elements <- 1:d
-  }
   
   t1 <- Sys.time()
   
@@ -40,31 +43,37 @@ stoppingCriterionPara <- function(Tau.hat, Delta.list, Sigma.list, elements = NU
   }
   
   al <- parSapply(cl, elements.red, function(i){
-    Delta <- Delta.list[[i]]
-    Delta2 <- tcrossprod(Delta)
-    
-    tau.tilde <- ((Delta2 %*% (Tau.hat - diag(d)) %*% Delta2) / (Delta2 %*% (1 - diag(d)) %*% Delta2))[l.ij.mat]
+    clus <- clus.list[[i]]
+    mem <- which(clus %in% pair)
+    clus[mem] <- pair[1]
+    clus <- frank(clus,ties.method="dense")
+    ind <- do.call(what = rbind, lapply(seq_along(mem), function(i){
+      cbind(rep(mem[i],d-i),(1:d)[-mem[1:i]])
+    }))
+    tau.tilde[ij.l.mat[ind]] <- Tt[cbind(clus[ind[,1]],clus[ind[,2]])]
+
     vec <- tau.tilde - tau.hat
     
     Si <- ((1-w)*Sigma.list[[i]] + w*mean(Sigma.list[[i]]))^(-1)
-    R <- as.numeric(crossprod(vec^2, Si))
-
+    R <- sum(vec^2*Si)
+    
     #print(matrix.trace(Gamma))
     #1 - pchisq(R, p - matrix.trace(Gamma))
-    K  <- ncol(Delta)
-    L <- K*(K-1)/2 + sum(colSums(Delta) > 1)
+    K  <- d-i+1
+    L <- K*(K-1)/2 + sum(sapply(clus, function(j){sum(clus==j) > 1}))
     1 - pchisq(R, p - L)
   })
   t2 <- Sys.time()
   print(difftime(t2,t1))
   
   stopCluster(cl)
-
+  
   if(length(ones) > 0){
     new.al <- rep(1, length(elements))
     new.al[elements.red] <- al
-  return(new.al)  
+    return(new.al)  
   }else{
     return(al)
   }
 }
+
