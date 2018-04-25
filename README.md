@@ -1,5 +1,5 @@
 # learning-block-exchangeability
-Code from working paper. The objective is to detect block-exchangeable structures in correlation matrices. Functions and examples are provided. (In progress.)
+Code from working paper. The objective is to detect block-exchangeable structures in correlation matrices. Functions and examples are provided.
 
 See https://www.researchgate.net/project/Detection-of-Exchangeable-Structures-in-Correlation-Matrices for more info.
 
