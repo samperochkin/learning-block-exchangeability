@@ -41,7 +41,7 @@ Sigma.hat <- buildSigma(Theta.hat, Tau.hat[l.ij.mat], n)
 # Here we do a basic hierarchical clustering. Note the distance matrix is dist(Tau.hat)
 # as opposed to as.dist(1-Tau.hat^2). It makes more sense to recover blocks.
 par(mfrow= c(1,1), mar = c(2,2,1,1))
-hc <- hclust(dist(Tau.hat), method = "complete")
+hc <- hclust(dist(Tau.hat), method = "ward.D")
 plot(hc)
 
 # let us evaluate the cut producing a small number of clusters
