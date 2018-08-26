@@ -15,7 +15,7 @@ Also contains scripts that generate the tables for the paper (there are very sma
 Contains the results obtained with the scripts in simulation-study2-scripts.
 
 # application-NASDAQ100
-Contains necessary scripts to apply the algorithm in high-dimensional settings on log-returns.
+Contains necessary scripts to apply the algorithm when the number of variables is relatively large settings (on stocks data).
 
 # application-1330
 Contains a toy example with 1330 variables and 29 observations developped for an application to data that cannot be made available.
