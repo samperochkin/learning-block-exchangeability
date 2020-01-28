@@ -1,9 +1,3 @@
-# # Tau.hat 
-# Delta.list <- path$D
-# Sigma.list <- path$S
-# alpha <- .05
-# # l.ij.mat
-
 stoppingCriterion <- function(Tau.hat, Delta.list, Sigma.list, alpha, l.ij.mat){
   
   d <- dim(Tau.hat)[1]
@@ -28,7 +22,7 @@ stoppingCriterion <- function(Tau.hat, Delta.list, Sigma.list, alpha, l.ij.mat){
     B[cbind(1:p,l.blocks)] <- 1
     
     Gamma <- B%*%t(B)%*%ginv(B%*%t(B))
- 
+    
     tau.tilde <- ((Delta2 %*% (Tau.hat - diag(d)) %*% Delta2) / (Delta2 %*% (1 - diag(d)) %*% Delta2))[l.ij.mat]
     vec <- tau.tilde - tau.hat
     R <- crossprod(vec,diag(p) - Gamma)  %*% solve(Sigma.list[[i]]) %*% vec
