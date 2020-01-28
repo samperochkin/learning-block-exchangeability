@@ -4,10 +4,16 @@
 # alpha <- .05
 # # l.ij.mat
 
-stoppingCriterion <- function(Tau.hat, Delta.list, Sigma.list, alpha, l.ij.mat){
+stoppingCriterion <- function(Tau.hat, Delta.list, Sigma.list, alpha){
   
   d <- dim(Tau.hat)[1]
   p <- d * (d - 1) / 2
+  
+  l.ij.mat <- t(sapply(1:p,function(l){
+    i <- d-sum(l<=cumsum(d-(1:(d-1))))
+    j <- l - ((i-1)*d - i*(i-1)/2 - i)
+    c(i,j)
+  }))
   
   tau.hat <- Tau.hat[l.ij.mat]
   
