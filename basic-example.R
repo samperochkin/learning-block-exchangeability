@@ -8,6 +8,8 @@ library(Matrix)
 sapply(list.files(pattern="[.]R$", path = "functions", full.names=TRUE), source)
 source("functions/pathBuilder_revised.R")
 source("functions/stoppingCriterion_revised.R")
+source("functions/buildSigma_revised.R")
+source("functions/computeTh_revised.R")
 source("functions/computeTt_revised.R")
 
 
