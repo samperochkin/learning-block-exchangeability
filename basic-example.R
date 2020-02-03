@@ -39,16 +39,15 @@ image(t(Tau.hat[d:1,]), zlim=c(0,1))
 path <- pathBuilder(Tau.hat, Theta.hat, nrow(X), 1)
 a <- stoppingCriterion(Tau.hat, path$D, path$S)
 
-plot(a,pch=19,xlab="K",ylab="critere")
-lines(a)
+plot(0:(d-1),a,pch=19,xlab="d-K",ylab="critere")
+lines(0:(d-1),a)
 abline(h=.05,col="red")
 
 alpha <- .05
 # we select K=
-which(rev(cummin(a) > alpha))[1]
-
-
-
+which(rev(a) > alpha)[1]
+# or
+d-which(c(a,0) < alpha)[1]+2
 
 
 # Simulation experiment ---------------------------------------------------
