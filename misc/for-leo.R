@@ -151,7 +151,7 @@ clus <- cutree(hc, K)
 St <- constrainSigma(Sh, clus)
 image(t(St)[,p:1])
 
-eig <- eigen(Sh)
+eig <- eigen(St)
 plot(eig$values)
 Sti <- eig$vectors %*% diag(1/eig$values) %*% t(eig$vectors)
 Sti2 <- eig$vectors %*% diag(1/sqrt(eig$values)) %*% t(eig$vectors)
