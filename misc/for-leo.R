@@ -114,13 +114,78 @@ p <- choose(d,2)
 # compute tau and its jackknife variance in O(n*log(n))
 TSh <- tautests::tau_and_jack(X)
 Sh <- TSh$jack_var
-th <- TSh$tau[tautests::R2IJ(1:p)] # same as upper.tri
+Th <- TSh$tau
+image(t(Th)[,d:1])
+th <- Th[tautests::R2IJ(1:p)]
 
 
 St <- constrainSigma(Sh, clus)
-image(t(St)[p:1,])
+image(t(St)[,p:1])
 
 # checkup (when all clusters are greater than 3)
 length(unique(c(St))) == (K^4 + 6*K^3 + 11*K^2 + 6*K)/8
+
+
+
+###########################################################################
+# true application --------------------------------------------------------
+###########################################################################
+
+X <- as.matrix(fread("~/Downloads/data_pe.csv"))
+n <- nrow(X)
+d <- ncol(X)
+p <- choose(d,2)
+
+# compute tau and its jackknife variance in O(n*log(n))
+TSh <- tautests::tau_and_jack(X)
+Sh <- TSh$jack_var
+Th <- TSh$tau
+image(t(Th)[,d:1])
+th <- Th[tautests::R2IJ(1:p)]
+
+hc <- hclust(as.dist(1-abs(Th)), "ward.D2")
+plot(hc)
+K <- 5
+clus <- cutree(hc, K)
+
+St <- constrainSigma(Sh, clus)
+image(t(St)[,p:1])
+
+eig <- eigen(Sh)
+plot(eig$values)
+Sti <- eig$vectors %*% diag(1/eig$values) %*% t(eig$vectors)
+Sti2 <- eig$vectors %*% diag(1/sqrt(eig$values)) %*% t(eig$vectors)
+
+# checkup (when all clusters are greater than 3)
+length(unique(c(St))) == (K^4 + 6*K^3 + 11*K^2 + 6*K)/8
+
+
+
+ij <- tautests::R2IJ(1:p)
+A <- matrix(0,d,K)
+A[cbind(1:d,clus)] <- 1  
+A <- t(apply(ij, 1, function(x) colSums(A[x,])))
+A_u <- unique(A)
+B <- matrix(0, nrow(A), nrow(A_u))
+B[cbind(1:p, apply(A, 1, function(a) which.max(colSums(a == t(A_u)))))] <- 1
+B <- B[, colSums(B) != 0]
+L <- ncol(B)
+
+G <- B %*% MASS::ginv(B)
+# IG <- diag(p) - G
+tt <- G %*% th
+Tt <- diag(d); Tt[ij] <- Tt[ij[,2:1]] <- tt
+par(mfrow=c(1,2), mar=c(2,2,1,1))
+image(t(Th)[,d:1], zlim = range(c(Th,Tt)))
+image(t(Tt)[,d:1], zlim = range(c(Th,Tt)))
+
+loss_E <- mahalanobis(th, tt, Sti, T)
+pchisq(loss_E, p - L, lower.tail = F)
+
+loss_M <- max(abs(Sti2 %*% (th- tt)))
+mc_loss_M <- apply(mvtnorm::rmvnorm(1000, sigma = St),1,function(x) max(abs(x)))
+mean(loss_M <= mc_loss_M)
+
+
 
 
