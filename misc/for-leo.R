@@ -44,8 +44,8 @@ constrainSigma <- function(Sh, clus, debug = F){
       }
       
       # collect entries from both blocks
-      ij_u <- ij[r_u,]
-      ij_v <- ij[s_v,]
+      ij_u <- ij[r_u,,drop=F]
+      ij_v <- ij[s_v,,drop=F]
       p_u <- nrow(ij_u)
       p_v <- nrow(ij_v)
       
@@ -127,10 +127,14 @@ length(unique(c(St))) == (K^4 + 6*K^3 + 11*K^2 + 6*K)/8
 
 
 
+
+
+
 ###########################################################################
 # true application --------------------------------------------------------
 ###########################################################################
 
+# load data
 X <- as.matrix(fread("~/Downloads/data_pe.csv"))
 n <- nrow(X)
 d <- ncol(X)
@@ -143,11 +147,13 @@ Th <- TSh$tau
 image(t(Th)[,d:1])
 th <- Th[tautests::R2IJ(1:p)]
 
+# clustering
 hc <- hclust(as.dist(1-abs(Th)), "ward.D2")
 plot(hc)
 K <- 5
 clus <- cutree(hc, K)
 
+# structure Sigma and compute inverse and principal square root
 St <- constrainSigma(Sh, clus)
 image(t(St)[,p:1])
 
@@ -160,7 +166,7 @@ Sti2 <- eig$vectors %*% diag(1/sqrt(eig$values)) %*% t(eig$vectors)
 length(unique(c(St))) == (K^4 + 6*K^3 + 11*K^2 + 6*K)/8
 
 
-
+# construct membership matrix B
 ij <- tautests::R2IJ(1:p)
 A <- matrix(0,d,K)
 A[cbind(1:d,clus)] <- 1  
@@ -171,21 +177,29 @@ B[cbind(1:p, apply(A, 1, function(a) which.max(colSums(a == t(A_u)))))] <- 1
 B <- B[, colSums(B) != 0]
 L <- ncol(B)
 
+# construct Gamma matrix and covariance matrix for Monte Carlo
 G <- B %*% MASS::ginv(B)
-# IG <- diag(p) - G
+IG <- diag(p) - G
 tt <- G %*% th
 Tt <- diag(d); Tt[ij] <- Tt[ij[,2:1]] <- tt
 par(mfrow=c(1,2), mar=c(2,2,1,1))
 image(t(Th)[,d:1], zlim = range(c(Th,Tt)))
 image(t(Tt)[,d:1], zlim = range(c(Th,Tt)))
+St_dag <- Sti2 %*% IG %*% St %*% IG %*% Sti2
 
-loss_E <- mahalanobis(th, tt, Sti, T)
-pchisq(loss_E, p - L, lower.tail = F)
+# p-values
+mc_z <- mvtnorm::rmvnorm(2000, sigma = St_dag)
 
-loss_M <- max(abs(Sti2 %*% (th- tt)))
-mc_loss_M <- apply(mvtnorm::rmvnorm(1000, sigma = St),1,function(x) max(abs(x)))
-mean(loss_M <= mc_loss_M)
+loss_E <- n*mahalanobis(th, tt, Sti, T)
+pval_E <- pchisq(loss_E, p - L, lower.tail = F)
+mc_loss_E <- apply(mc_z,1,function(x) c(crossprod(x)))
+hist(mc_loss_E); abline(v=loss_E, col=4, lty=2)
+c(pval_E, mean(loss_E <= mc_loss_E)) # just for checking
 
+loss_M <- sqrt(n)*max(abs(Sti2 %*% (th-tt)))
+mc_loss_M <- apply(mc_z,1,function(x) max(abs(x)))
+pval_M <- mean(loss_M <= mc_loss_M)
+hist(mc_loss_M); abline(v=loss_M, col=4, lty=2); pval_M
 
-
+c(pval_E, pval_M)
 
