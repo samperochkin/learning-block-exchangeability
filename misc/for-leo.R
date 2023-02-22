@@ -193,13 +193,13 @@ mc_z <- mvtnorm::rmvnorm(2000, sigma = St_dag)
 loss_E <- n*mahalanobis(th, tt, Sti, T)
 pval_E <- pchisq(loss_E, p - L, lower.tail = F)
 mc_loss_E <- apply(mc_z,1,function(x) c(crossprod(x)))
-hist(mc_loss_E); abline(v=loss_E, col=4, lty=2)
-c(pval_E, mean(loss_E <= mc_loss_E)) # just for checking
+hist(mc_loss_E); abline(v=loss_E, col=2, lty=3, lwd=2)
+# c(pval_E, mean(loss_E <= mc_loss_E)) # just for checking
 
 loss_M <- sqrt(n)*max(abs(Sti2 %*% (th-tt)))
 mc_loss_M <- apply(mc_z,1,function(x) max(abs(x)))
 pval_M <- mean(loss_M <= mc_loss_M)
-hist(mc_loss_M); abline(v=loss_M, col=4, lty=2); pval_M
+hist(mc_loss_M); abline(v=loss_M, col=2, lty=3, lwd=2); pval_M
 
 c(pval_E, pval_M)
 
