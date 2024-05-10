@@ -3,8 +3,8 @@ library(parallel)
 library(Matrix)
 library(pcaPP)
 
-library(pcaPP)
 library(dendextend)
+
 
 X <- as.matrix(fread("application-NASDAQ100/X_NASDAQ100"))
 NASDAQ100 <- fread("application-NASDAQ100/NASDAQ100")
