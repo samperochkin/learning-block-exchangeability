@@ -6,60 +6,39 @@ library(pcaPP)
 library(dendextend)
 
 
-X <- as.matrix(fread("application-NASDAQ100/X_NASDAQ100"))
+X <- as.matrix(fread("application-NASDAQ100/X_NASDAQ100"))[,1:45]
 NASDAQ100 <- fread("application-NASDAQ100/NASDAQ100")
 
 full.names <- as.vector(NASDAQ100$Name)
 sectors <- as.vector(NASDAQ100$Sector)
 industry <- as.vector(NASDAQ100$industry)
 
-colnames(X) <- readRDS("application-NASDAQ100/symbols")
+colnames(X) <- readRDS("application-NASDAQ100/symbols")[1:45]
 n <- nrow(X)
 d <- ncol(X)
 
-########## No need to run ######### result available below ##############
 
 ########
 # loading the necessary functions and computing the parameter Theta
 ########
-# sapply(list.files(pattern="[.]R$", path = "application-NASDAQ100/functions", full.names=TRUE), source)
-# Tau.hat <- cor.fk(X)
-# Theta.hat <- computeThPara(X)
+sapply(list.files(pattern="[.]R$", path = "application-NASDAQ100/functions", full.names=TRUE), source)
+Tau.hat <- cor.fk(X)
+Theta.hat <- computeThPara(X)
 
 
 #######
 # running the algorithm (may take quite a while with d=107 variables)
 #######
-# path <- pathBuilder0Para(Tau.hat, Theta.hat, n)
-# saveRDS(path, "application-NASDAQ100/path_NASDAQ100_Para")
-
-#########################################################################
+path <- pathBuilder0Para(Tau.hat, Theta.hat, n)
 
 
-path <- readRDS("application-NASDAQ100/path_NASDAQ100_Para")
-
-
-#elements <- 1:d
-#a <- stoppingCriterion0Para(path$Th, path$D, path$S, elements)
-#saveRDS(a, "application-NASDAQ100/a_NASDAQ100_Para")
-
-a <- readRDS("application-NASDAQ100/a_NASDAQ100_Para")
+elements <- 1:d
+a <- stoppingCriterion0Para(path$Th, path$D, path$S, elements)
 plot(a, pch = 19, type = "l", xaxt = "n")
 points(x = 1:d, y = a, pch = 19)
 axis(1, at=seq(1,d,2), labels=seq(d,1,-2))
 
 
-
-
-# zoom
-j1 <- d - 20 + 1
-j2 <- d - 10 + 1
-
-par(mfrow = c(1,1), mar = c(2,2,1,1))
-plot(a[j1:j2], pch = 19, type = "l", xaxt = "n")
-axis(1, at=seq(1,d-j1+1,2), labels=seq(d-j1+1,1,-2))
-
-points(x = 0:10 + 1, y = a[j1:j2], pch = 19)
 
 
 alpha <- .95
