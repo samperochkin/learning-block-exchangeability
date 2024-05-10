@@ -1,10 +1,6 @@
 library(data.table)
 library(parallel)
 library(Matrix)
-library(pcaPP)
-
-library(pcaPP)
-library(dendextend)
 
 X <- as.matrix(fread("application-NASDAQ100/X_NASDAQ100"))
 NASDAQ100 <- fread("application-NASDAQ100/NASDAQ100")
@@ -22,16 +18,18 @@ d <- ncol(X)
 ########
 # loading the necessary functions and computing the parameter Theta
 ########
-# sapply(list.files(pattern="[.]R$", path = "application-NASDAQ100/functions", full.names=TRUE), source)
-# Tau.hat <- cor.fk(X)
-# Theta.hat <- computeThPara(X)
+
+#sapply(list.files(pattern="[.]R$", path = "sim-stuff/simulation-study2-scripts/functions", full.names=TRUE), source)
+#sapply(list.files(pattern="[.]R$", path = "application-NASDAQ100/functions", full.names=TRUE), source)
+#Theta.hat <- computeThPara(X)
 
 
 #######
 # running the algorithm (may take quite a while with d=107 variables)
 #######
-# path <- pathBuilder0Para(Tau.hat, Theta.hat, n)
-# saveRDS(path, "application-NASDAQ100/path_NASDAQ100_Para")
+
+#path <- pathBuilder0Para(cor.fk(X), Theta.hat, nrow(X))
+#saveRDS(path, "application-NASDAQ100/path_NASDAQ100_Para")
 
 #########################################################################
 

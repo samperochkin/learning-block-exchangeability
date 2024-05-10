@@ -1,17 +1,20 @@
-pathBuilder0Para <- function(Tau.hat, Theta.hat, n, cutoff = NULL, mc_cores = 1){
+pathBuilder0Para <- function(Tau.hat, Theta.hat, n, cutoff = NULL){
   
   #### Package for parallel computations ####
-  if(mc_cores > 1) cat("mc_cores > 1. Using parallel package. Make sure it is loaded.\n")
   
-
+  library(parallel)
+  
   #### fixed parameters ####
+  
   d <- dim(Tau.hat)[1]
   p <- d * (d - 1) / 2
+  
   if(is.null(cutoff)){
     cutoff <- d
   }
   
   #### vectorizing ####
+  
   l.ij.mat <- t(sapply(1:p,function(l){
     i <- d-sum(l<=cumsum(d-(1:(d-1))))
     j <- l - ((i-1)*d - i*(i-1)/2 - i)
@@ -19,6 +22,7 @@ pathBuilder0Para <- function(Tau.hat, Theta.hat, n, cutoff = NULL, mc_cores = 1)
   }))
   
   #### Additional initial values ####
+  
   Tau.list <- list()
   Sigma.list <- list()
   Delta.list <- list()
@@ -37,6 +41,7 @@ pathBuilder0Para <- function(Tau.hat, Theta.hat, n, cutoff = NULL, mc_cores = 1)
   
   
   #### Functions for the iterations ####
+  
   DeltaCandidates <- function(Delta){
     K <- dim(Delta)[2]
     
@@ -89,30 +94,27 @@ pathBuilder0Para <- function(Tau.hat, Theta.hat, n, cutoff = NULL, mc_cores = 1)
   }
   
   #### Iterations ####
+  # i <- 3
+  
   for(i in 2:(d-1)){
     print(paste0("Hey! Now at iteration ", i))
     Delta.candidates <- DeltaCandidates(Delta.list[[i-1]])
     
     # We parallel the computations for the potential losses
-    if(mc_cores > 1){
-      cl <- makeCluster(mc_cores)
-      
-      t1 <- Sys.time()
-      print("export")
-      # Should definitively let the workers construct the candidates (they need) - to do later, or never.
-      # The bottleneck clearly this next line.
-      clusterExport(cl, c("Delta.candidates", "Tau.hat", "Si", "l.ij.mat", "d", "loss", "tau.hat"), envir = environment())
-      t2 <- Sys.time()
-      print(difftime(t2,t1))
-      
-      new.Delta <- Delta.candidates[[which.min(parSapply(cl, Delta.candidates, function(Delta){loss(Delta, Tau.hat, Si, l.ij.mat, d)}))]]
-      
-      stopCluster(cl)
-      
-    }else{
-      new.Delta <- Delta.candidates[[which.min(sapply(Delta.candidates, function(Delta){loss(Delta, Tau.hat, Si, l.ij.mat, d)}))]]
-    }
-
+    cl <- makeCluster(detectCores()-1)
+    t1 <- Sys.time()
+    print("export")
+    # Should definitively let the workers construct the candidates (they need) - to do later, or never.
+    # The bottleneck clearly this next line.
+    clusterExport(cl, c("Delta.candidates", "Tau.hat", "Si", "l.ij.mat", "d", "loss", "tau.hat"), envir = environment())
+    t2 <- Sys.time()
+    print(difftime(t2,t1))
+    
+    new.Delta <- Delta.candidates[[which.min(parSapply(cl, Delta.candidates, function(Delta){loss(Delta, Tau.hat, Si, l.ij.mat, d)}))]]
+    
+    stopCluster(cl)
+    
+    print("rest")
     Delta2 <- tcrossprod(new.Delta)
     tau.tilde <- ((Delta2 %*% (Tau.hat - diag(d)) %*% Delta2) / (Delta2 %*% (1 - diag(d)) %*% Delta2))[l.ij.mat]
     Theta.tilde <- computeTt(new.Delta, Theta.hat, l.ij.mat)
