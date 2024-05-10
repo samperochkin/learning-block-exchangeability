@@ -44,7 +44,14 @@ path <- readRDS("application-NASDAQ100/path_NASDAQ100_Para")
 #saveRDS(a, "application-NASDAQ100/a_NASDAQ100_Para")
 
 a <- readRDS("application-NASDAQ100/a_NASDAQ100_Para")
+plot(a, pch = 19, type = "l", xaxt = "n")
+points(x = 1:d, y = a, pch = 19)
+axis(1, at=seq(1,d,2), labels=seq(d,1,-2))
 
+
+
+
+# zoom
 j1 <- d - 20 + 1
 j2 <- d - 10 + 1
 
